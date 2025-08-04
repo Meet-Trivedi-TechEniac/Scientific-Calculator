@@ -1,6 +1,7 @@
 
 let flag = 0;
 const operators = ['+', '-', '*', '/', '%', '**'];
+let memoryValue = 0;
 
 const display = document.getElementById('display');
 const buttons = document.querySelectorAll('.btn');
@@ -24,6 +25,15 @@ const piButton = document.getElementById('pi');
 const floorButton = document.getElementById('floor');
 const ceilButton = document.getElementById('ceil');
 const dotButton = document.getElementById('dot');
+const msButton = document.getElementById('ms');
+const mrButton = document.getElementById('mr');
+const mcButton = document.getElementById('mc');
+const mPlusButton = document.getElementById('mplus');
+const mMinusButton = document.getElementById('mminus');
+const memoryEl = document.getElementById('memoryValue');
+
+
+
 
 
 // Function to find factorial
@@ -61,13 +71,49 @@ function getLastChar(expr) {
     return expr.slice(-1);
 }
 
+// function for memory value
+
+function updateMemoryDisplay() {
+    memoryEl.textContent = memoryValue;
+}
+
+function wrapLast(expr, wrapperFn) {
+    // 1) bracketed expression?
+    if (expr.endsWith(')')) {
+        let balance = 0, openIdx = -1;
+        for (let i = expr.length - 1; i >= 0; i--) {
+            if (expr[i] === ')') balance++;
+            else if (expr[i] === '(') balance--;
+            if (balance === 0) { openIdx = i; break; }
+        }
+        if (openIdx !== -1) {
+            const inside = expr.slice(openIdx);
+            return expr.slice(0, openIdx) + wrapperFn(inside);
+        }
+    }
+    // 2) trailing number?
+    const m = expr.match(/(\d*\.?\d+)(?!.*\d)/);
+    if (m) {
+        const [num] = m;
+        const start = m.index;
+        return expr.slice(0, start) + wrapperFn(num);
+    }
+    return expr;
+}
+
+function applyAndRefresh(fn) {
+    const expr = display.textContent;
+    display.textContent = fn(expr);
+}
+
+
 buttons.forEach(button => {
     button.addEventListener('click', () => {
         const value = button.textContent;
 
 
 
-        if (value == 'C' || value == '=' || value == '⌫' || value == '+/-' || value == '(' || value == ')' || value == 'ln' || value == 'log' || value == 'x!' || value == 'exp' || value == 'xʸ' || value == '1/x' || value == 'x²' || value == '√x' || value == "10^x" || value == 'π' || value == 'floor' || value == 'ceil' || value == '|x|') {
+        if (value == 'C' || value == '=' || value == '⌫' || value == '+/-' || value == '(' || value == ')' || value == 'ln' || value == 'log' || value == 'x!' || value == 'exp' || value == 'xʸ' || value == '1/x' || value == 'x²' || value == '2√x' || value == "10^x" || value == 'π' || value == 'floor' || value == 'ceil' || value == '|x|' || value == 'sin' || value == 'cos' || value == 'tan' || value == 'cosec' || value == 'sec' || value == 'cot') {
             //Handel LAter
             return;
         }
@@ -126,6 +172,14 @@ buttons.forEach(button => {
             return;
         }
 
+        if (!isNaN(lastChar)) {
+            if (display.textContent.endsWith('E')) {
+                display.textContent += '*';
+            }
+
+        }
+
+
 
 
         display.textContent += value;
@@ -136,17 +190,28 @@ buttons.forEach(button => {
 })
 
 clearButton.addEventListener('click', () => {
+    memoryValue = 0;
     display.textContent = 0;
 })
 
 equalsButton.addEventListener('click', () => {
     try {
 
+        let expr = display.textContent;
+
+        // Convert sin(x) to sin(x * PI / 180)
+        expr = expr.replace(/Math\.sin\(([^()]+)\)/g, 'Math.sin(($1)*Math.PI/180)');
+        expr = expr.replace(/Math\.cos\(([^()]+)\)/g, 'Math.cos(($1)*Math.PI/180)');
+        expr = expr.replace(/Math\.tan\(([^()]+)\)/g, 'Math.tan(($1)*Math.PI/180)');
+        expr = expr.replace(/1\/Math\.sin\(([^()]+)\)/g, '1/Math.sin(($1)*Math.PI/180)');
+        expr = expr.replace(/1\/Math\.cos\(([^()]+)\)/g, '1/Math.cos(($1)*Math.PI/180)');
+        expr = expr.replace(/1\/Math\.tan\(([^()]+)\)/g, '1/Math.tan(($1)*Math.PI/180)');
+
         if (display.textContent.includes('/0')) {
             display.textContent = 'Error';
             return;
         }
-        const result = eval(display.textContent);
+        const result = eval(expr);
         display.textContent = '';
         display.textContent = result;
         console.log(result);
@@ -234,6 +299,7 @@ logButton.addEventListener('click', () => {
 });
 
 factorialButton.addEventListener('click', () => {
+    resetAfterEval('x!');
     try {
         // console.log('click');
         let expr = display.textContent;
@@ -243,6 +309,7 @@ factorialButton.addEventListener('click', () => {
 
         const number = parseInt(match[0]);
         const fact = factorial(number);
+        flag = 1;
 
         display.textContent = expr.slice(0, match.index) + fact;
     } catch (error) {
@@ -442,6 +509,119 @@ ceilButton.addEventListener('click', () => {
 
 
 })
+
+// Memory Store MS
+msButton.addEventListener('click', () => {
+    try {
+        memoryValue = eval(display.textContent);
+    } catch (error) {
+        display.textContent = 'Error';
+    }
+    updateMemoryDisplay();
+})
+
+// Memory Recall (MR); // MR → Recall (replace display)
+mrButton.addEventListener('click', () => {
+
+
+    console.log('mv', memoryValue);
+    // display.textContent += String(memoryValue);
+    display.textContent = String(memoryValue);
+
+});
+
+// Memory Clear (MC)
+mcButton.addEventListener('click', () => {
+    memoryValue = 0;
+    updateMemoryDisplay();
+})
+
+// Memory Add (M+)
+mPlusButton.addEventListener('click', () => {
+    try {
+        memoryValue += eval(display.textContent);
+    } catch (error) {
+
+        // display.textContent = 'Error';
+
+    }
+
+    updateMemoryDisplay();
+})
+
+// Memory Subtract (M-)
+mMinusButton.addEventListener('click', () => {
+    try {
+        memoryValue -= eval(display.textContent);
+    } catch (error) {
+        // display.textContent = 'Error';
+
+    }
+    updateMemoryDisplay();
+})
+
+
+
+// sin
+document.getElementById('sin').addEventListener('click', () => {
+    if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = 'Math.sin(';
+    } else {
+        display.textContent += '*Math.sin(';
+    }
+});
+
+document.getElementById('cos').addEventListener('click', () => {
+    if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = 'Math.cos(';
+    } else {
+        display.textContent += '*Math.cos(';
+    }
+});
+
+
+document.getElementById('tan').addEventListener('click', () => {
+    if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = 'Math.tan(';
+    } else {
+        display.textContent += '*Math.tan(';
+    }
+});
+
+
+document.getElementById('cosec').addEventListener('click', () => {
+    if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = 'Math.cosec(';
+    } else {
+        display.textContent += '*Math.cosec(';
+    }
+});
+
+
+document.getElementById('sec').addEventListener('click', () => {
+    if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = 'Math.sec(';
+    } else {
+        display.textContent += '*Math.sec(';
+    }
+});
+
+
+document.getElementById('cot').addEventListener('click', () => {
+    if (display.textContent === '0' || display.textContent === 'Error') {
+        display.textContent = 'Math.cot(';
+    } else {
+        display.textContent += '*Math.cot(';
+    }
+});
+
+
+
+
+
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
