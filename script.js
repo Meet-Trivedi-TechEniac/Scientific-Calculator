@@ -31,6 +31,7 @@ const mcButton = document.getElementById('mc');
 const mPlusButton = document.getElementById('mplus');
 const mMinusButton = document.getElementById('mminus');
 const memoryEl = document.getElementById('memoryValue');
+const historyList = document.getElementById('historyList');
 
 
 
@@ -216,6 +217,15 @@ equalsButton.addEventListener('click', () => {
         display.textContent = result;
         console.log(result);
         flag = 1;
+
+        const entry = document.createElement('li');
+        entry.textContent = `${expr} = ${result}`;
+        historyList.prepend(entry); // newest at top
+
+        // (optional) limit history length:
+        if (historyList.children.length > 20) {
+            historyList.removeChild(historyList.lastChild);
+        }
 
     }
     catch (error) {
@@ -506,14 +516,24 @@ ceilButton.addEventListener('click', () => {
     } else {
         display.textContent += '*Math.ceil(';
     }
-
-
 })
 
 // Memory Store MS
 msButton.addEventListener('click', () => {
     try {
         memoryValue = eval(display.textContent);
+        updateMemoryDisplay();
+
+
+        // 2) Add to history
+        const entry = document.createElement('li');
+        entry.textContent = `MS → ${memoryValue}`;
+        historyList.prepend(entry);
+
+        // 3) Optional: keep only last 20 entries
+        if (historyList.children.length > 20) {
+            historyList.removeChild(historyList.lastChild);
+        }
     } catch (error) {
         display.textContent = 'Error';
     }
@@ -607,13 +627,13 @@ document.getElementById('sec').addEventListener('click', () => {
 });
 
 
-document.getElementById('cot').addEventListener('click', () => {
-    if (display.textContent === '0' || display.textContent === 'Error') {
-        display.textContent = 'Math.cot(';
-    } else {
-        display.textContent += '*Math.cot(';
-    }
-});
+// document.getElementById('cot').addEventListener('click', () => {
+//     if (display.textContent === '0' || display.textContent === 'Error') {
+//         display.textContent = 'Math.cot(';
+//     } else {
+//         display.textContent += '*Math.cot(';
+//     }
+// });
 
 
 
