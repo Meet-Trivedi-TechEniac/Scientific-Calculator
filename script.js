@@ -1,8 +1,9 @@
 
 let flag = 0;
-let flag1 = 0;  //for fact and all
 const operators = ['+', '-', '*', '/', '%', '**'];
 let memoryValue = 0;
+let lastWasFunction = false;
+
 
 const display = document.getElementById('display');
 const buttons = document.querySelectorAll('.btn');
@@ -127,6 +128,10 @@ buttons.forEach(button => {
         const lastTwoChar = display.textContent.slice(-2);
         // console.log(lastTwoChar);
         const operators = ['+', '-', '*', '/', '%', '**'];
+
+        if (lastChar === ')' || lastChar === 'I') {
+            display.textContent += '*';
+        }
         // console.log(flag);
 
         // if (flag) {
@@ -142,9 +147,9 @@ buttons.forEach(button => {
         //     }
         // }
 
-        if (flag && flag1) {
+        if (flag) {
             const isOperator = operators.includes(value);
-            const isFuncOrBracket = ['(', 'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.log(', 'Math.ceil(', 'Math.floor(', 'Math.exp(', 'Math.sqrt('].some(f => display.textContent.includes(f));
+            const isFuncOrBracket = ['(', 'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.log(', 'Math.ceil(', 'Math.floor(', 'Math.exp(', 'Math.sqrt(', 'Math.exp('].some(f => display.textContent.includes(f));
 
             if (isOperator || isFuncOrBracket || value === '(') {
                 // Continue chaining
@@ -193,6 +198,7 @@ buttons.forEach(button => {
                 // console.log(display.textContent);
             }
             return;
+
         }
 
         //prevent duplicate operators
@@ -200,7 +206,6 @@ buttons.forEach(button => {
         if (operators.includes(value) && operators.includes(lastChar)) {
             display.textContent = display.textContent.slice(0, -1) + value;
             console.log("Here", display.textContent);
-
             return;
         }
 
@@ -214,9 +219,33 @@ buttons.forEach(button => {
         }
 
 
+        if (lastWasFunction) {
+            let lastChar = display.textContent.slice(-1);
+            const operators = ['+', '-', '*', '/', '%', '**'];
+            console.log(value);
+            if (lastChar === '(') {
 
+            }
+
+
+            // else if (!operators.includes(value) || value === ')') {
+
+            else if (!operators.includes(value)) {
+                display.textContent += '*';
+                console.log("catch");
+            }
+            lastWasFunction = false;
+        }
+
+        if (lastChar == '(') {
+
+            display.textContent += value;
+            return;
+        }
 
         display.textContent += value;
+
+
         console.log(display.textContent);
 
 
@@ -331,10 +360,8 @@ lnButton.addEventListener('click', () => {
     if (display.textContent === '0' || display.textContent === 'Error') {
         display.textContent = 'Math.log(';
     }
-
-    else if (lastChar === '(') {
+    else if (lastChar === '(' || lastChar === ',') {
         display.textContent += 'Math.log(';
-
     } else {
         display.textContent += '*Math.log(';
     }
@@ -347,7 +374,7 @@ logButton.addEventListener('click', () => {
     if (display.textContent === '0' || display.textContent === 'Error') {
         display.textContent = 'Math.log10(';
     }
-    else if (lastChar === '(') {
+    else if (lastChar === '(' || lastChar === ',') {
         display.textContent += 'Math.log10(';
 
     }
@@ -377,12 +404,18 @@ factorialButton.addEventListener('click', () => {
 });
 
 expButton.addEventListener('click', () => {
+    let lastChar = display.textContent.slice(-1);
     if (display.textContent === '0' || display.textContent === 'Error') {
-        display.textContent = 'Math.E';
+        display.textContent = 'Math.exp(';
+    }
+    else if (lastChar === '(') {
+        display.textContent += 'Math.exp(';
+
     }
     else {
-        display.textContent += '*Math.E'
+        display.textContent += '*Math.exp(';
     }
+    lastWasFunction = true;
 });
 
 // absButton.addEventListener('click', () => {

@@ -4,3 +4,11 @@ When i click on delete then functions like floor annd are not remove at one time
 
 after press MR then if user press number or functions -> there are going to into multiple; 
 
+Can't do double sqrt
+
+if i do exp then number it does not goes into multiplication
+
+after pie if i click o number or function then it goes to multiplication  --> Done 👍
+
+after trigo function close bracket if user enter number then it goes to multiplication   --- > Done 👍
+
