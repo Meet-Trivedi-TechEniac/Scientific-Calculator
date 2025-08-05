@@ -56,17 +56,35 @@ function factorial(n) {
 function resetAfterEval(value) {
 
     console.log("flag", flag);
-    if (flag) {
-        if (operators.includes(value)) {
-            flag = 0;
-        }
-        else {
-            console.log("here");
+    // if (flag) {
+    //     if (operators.includes(value)) {
+    //         flag = 0;
+    //     }
+    //     else {
+    //         console.log("here");
 
+    //         display.textContent = '0';
+    //         flag = 0;
+    //     }
+    // }
+
+    if (flag) {
+        const currentExpr = display.textContent;
+
+        if (operators.includes(value)) {
+            flag = 0; // allow chaining operators after result
+        } else if (
+            currentExpr.endsWith('**') ||
+            currentExpr.endsWith('Math.pow(')
+        ) {
+            console.log("here in flag");
+            // do nothing: user is continuing the power operation
+        } else {
             display.textContent = '0';
             flag = 0;
         }
     }
+
 
 }
 
@@ -128,9 +146,11 @@ buttons.forEach(button => {
         const lastTwoChar = display.textContent.slice(-2);
         // console.log(lastTwoChar);
         const operators = ['+', '-', '*', '/', '%', '**'];
+        // const operators = ['+', '-', '*', '/', '**'];
 
         if (lastChar === ')' || lastChar === 'I') {
             display.textContent += '*';
+
         }
         // console.log(flag);
 
@@ -154,7 +174,16 @@ buttons.forEach(button => {
             if (isOperator || isFuncOrBracket || value === '(') {
                 // Continue chaining
                 flag = 0;
-            } else {
+            }
+            else if (
+                display.textContent.endsWith('**') ||
+                display.textContent.endsWith('Math.pow(')
+            ) {
+                console.log("here in flag");
+                flag=0;
+                // do nothing: user is continuing the power operation
+            }
+            else {
                 // User started a new number or expression — reset
                 display.textContent = '0';
                 flag = 0;
@@ -281,6 +310,7 @@ equalsButton.addEventListener('click', () => {
         display.textContent = result;
         console.log(result);
         flag = 1;
+        console.log("flag after  = ", flag);
 
         const entry = document.createElement('li');
         entry.textContent = `${expr} = ${result}`;
@@ -490,8 +520,6 @@ powerButton.addEventListener('click', () => {
 
         display.textContent += '**';
     }
-
-
 });
 
 reciprocalButton.addEventListener('click', () => {
@@ -520,40 +548,43 @@ squareButton.addEventListener('click', () => {
 
     const match = expr.match(/([a-zA-Z0-9\)\]]+)(?!.*[a-zA-Z0-9\)\]])/);
 
-    console.log(match);
+    console.log("match", match);
     if (match) {
         const start = match.index;
         const original = match[0];
         const squared = `(${original})**2`;
 
-        display.textContent = expr.slice(0, start) + squared;
+        display.textContent = expr.slice(start, match.length + 1) + squared;
 
     }
-
-
 });
 
 sqrtButton.addEventListener('click', () => {
     const expr = display.textContent;
+    let lastChar = display.textContent.slice(-1);
 
     const match = expr.match(/(\d*\.?\d+)(?!.*\d)/);
+    console.log(match);
 
     if (match) {
         const start = match.index;
         const number = match[0];
-        const newExpr = expr.slice(0, start) + `Math.sqrt(${number})`;
+        // const newExpr = expr.slice(start, match.length) + `Math.sqrt(${number})`;
         // display.textContent = newExpr;
         if (display.textContent === '0' || display.textContent === 'Error') {
             display.textContent = 'Math.sqrt(';
-        } else {
+        }
+        else {
+            // display.textContent += '*Math.sqrt(';
+            display.textContent += '*Math.sqrt(';
+        }
+    }
+    else {
+        if (lastChar === '(') {
             display.textContent += 'Math.sqrt(';
         }
     }
-
-
-
-
-})
+});
 
 tenPowerButton.addEventListener('click', () => {
     const expr = display.textContent;
