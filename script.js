@@ -1,6 +1,6 @@
 
 let flag = 0;
-const operators = ['+', '-', '*', '/', '%', '**'];
+const operators = ['+', '-', '*', '/', '%', '**','π'];
 let memoryValue = 0;
 let lastWasFunction = false;
 
@@ -75,9 +75,11 @@ function resetAfterEval(value) {
             flag = 0; // allow chaining operators after result
         } else if (
             currentExpr.endsWith('**') ||
-            currentExpr.endsWith('Math.pow(')
+            currentExpr.endsWith('Math.pow(')  
+            // currentExpr.endsWith('PI')
         ) {
             console.log("here in flag");
+            // flag=0;
             // do nothing: user is continuing the power operation
         } else {
             display.textContent = '0';
@@ -169,9 +171,9 @@ buttons.forEach(button => {
 
         if (flag) {
             const isOperator = operators.includes(value);
-            const isFuncOrBracket = ['(', 'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.log(', 'Math.ceil(', 'Math.floor(', 'Math.exp(', 'Math.sqrt(', 'Math.exp('].some(f => display.textContent.includes(f));
+            const isFuncOrBracket = ['(', 'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.log(', 'Math.ceil(', 'Math.floor(', 'Math.exp(', 'Math.sqrt(', 'Math.exp(','π'].some(f => display.textContent.includes(f));
 
-            if (isOperator || isFuncOrBracket || value === '(') {
+            if (isOperator || isFuncOrBracket || value === '(' || display.textContent!='0') {
                 // Continue chaining
                 flag = 0;
             }
@@ -185,6 +187,7 @@ buttons.forEach(button => {
             }
             else {
                 // User started a new number or expression — reset
+                // console.log("here in 0");
                 display.textContent = '0';
                 flag = 0;
             }
