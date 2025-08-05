@@ -1,5 +1,6 @@
 
 let flag = 0;
+let flag1 = 0;  //for fact and all
 const operators = ['+', '-', '*', '/', '%', '**'];
 let memoryValue = 0;
 
@@ -49,10 +50,11 @@ function factorial(n) {
 }
 
 
-// Functio for reset after eval
+// Function for reset after eval
 
 function resetAfterEval(value) {
-    console.log(flag);
+
+    console.log("flag", flag);
     if (flag) {
         if (operators.includes(value)) {
             flag = 0;
@@ -117,6 +119,8 @@ buttons.forEach(button => {
         if (value == 'C' || value == '=' || value == '⌫' || value == '+/-' || value == '(' || value == ')' || value == 'ln' || value == 'log' || value == 'x!' || value == 'exp' || value == 'xʸ' || value == '1/x' || value == 'x²' || value == '2√x' || value == "10^x" || value == 'π' || value == 'floor' || value == 'ceil' || value == '|x|' || value == 'sin' || value == 'cos' || value == 'tan' || value == 'cosec' || value == 'sec' || value == 'cot') {
             //Handel LAter
             return;
+
+
         }
 
         const lastChar = display.textContent.slice(-1);
@@ -125,26 +129,44 @@ buttons.forEach(button => {
         const operators = ['+', '-', '*', '/', '%', '**'];
         // console.log(flag);
 
-        if (flag) {
-            if (operators.includes(value)) {
-                console.log("here");
-                flag = 0;
-            }
-            else {
+        // if (flag) {
+        //     if (operators.includes(value)) {
+        //         console.log("here");
+        //         flag = 0;
+        //     }
+        //     else {
+        //         console.log("Flag==1")
 
+        //         display.textContent = '0';
+        //         flag = 0;
+        //     }
+        // }
+
+        if (flag && flag1) {
+            const isOperator = operators.includes(value);
+            const isFuncOrBracket = ['(', 'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.log(', 'Math.ceil(', 'Math.floor(', 'Math.exp(', 'Math.sqrt('].some(f => display.textContent.includes(f));
+
+            if (isOperator || isFuncOrBracket || value === '(') {
+                // Continue chaining
+                flag = 0;
+            } else {
+                // User started a new number or expression — reset
                 display.textContent = '0';
                 flag = 0;
             }
         }
 
+
+
+
         // if error is there then clear it
-        if (display.textContent == 'Error') {
+        if (display.textContent === 'Error') {
             display.textContent = '0';
         }
 
 
         // starting with 0 or operator
-        if (display.textContent == '0' && operators.includes(value)) {
+        if (display.textContent === '0' && operators.includes(value)) {
             if (value !== '-') {
                 return;
             }
@@ -159,17 +181,26 @@ buttons.forEach(button => {
         }
 
 
-        if (display.textContent == '0' && value !== '.') {
-            display.textContent = value;
+        if (display.textContent === '0' && value !== '.') {
+            // But allow if previous char is (
+            const lastChar = display.textContent.slice(-1);
+
+            // If display is only '0', replace it
+            if (display.textContent === '0') {
+                display.textContent = value;
+            } else {
+                display.textContent += value;
+                // console.log(display.textContent);
+            }
             return;
         }
-
 
         //prevent duplicate operators
 
         if (operators.includes(value) && operators.includes(lastChar)) {
             display.textContent = display.textContent.slice(0, -1) + value;
-            console.log(display.textContent);
+            console.log("Here", display.textContent);
+
             return;
         }
 
@@ -184,6 +215,7 @@ buttons.forEach(button => {
 
 
         display.textContent += value;
+        console.log(display.textContent);
 
 
 
@@ -202,6 +234,7 @@ equalsButton.addEventListener('click', () => {
 
         // Convert sin(x) to sin(x * PI / 180)
         expr = expr.replace(/Math\.sin\(([^()]+)\)/g, 'Math.sin(($1)*Math.PI/180)');
+        console.log("sin expr", expr);
         expr = expr.replace(/Math\.cos\(([^()]+)\)/g, 'Math.cos(($1)*Math.PI/180)');
         expr = expr.replace(/Math\.tan\(([^()]+)\)/g, 'Math.tan(($1)*Math.PI/180)');
         expr = expr.replace(/1\/Math\.sin\(([^()]+)\)/g, '1/Math.sin(($1)*Math.PI/180)');
@@ -584,10 +617,28 @@ mMinusButton.addEventListener('click', () => {
 
 // sin
 document.getElementById('sin').addEventListener('click', () => {
-    if (display.textContent === '0' || display.textContent === 'Error') {
+    // if (display.textContent === '0' || display.textContent === 'Error') {
+    //     display.textContent = 'Math.sin(';
+    // } else {
+    //     display.textContent += '*Math.sin(';
+    // }
+
+    if (
+        display.textContent === '0' ||
+        display.textContent === 'Error' ||
+        display.textContent === ''
+    ) {
         display.textContent = 'Math.sin(';
     } else {
-        display.textContent += '*Math.sin(';
+        const lastChar = display.textContent.slice(-1);
+
+        // If last char is a number, variable, or closing parenthesis, assume multiplication
+        if (/\d|\)|\w/.test(lastChar)) {
+            display.textContent += '*Math.sin(';
+            console.log(display.textContent);
+        } else {
+            display.textContent += 'Math.sin(';
+        }
     }
 });
 
