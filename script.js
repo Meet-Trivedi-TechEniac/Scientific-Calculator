@@ -370,37 +370,63 @@ expButton.addEventListener('click', () => {
     }
 });
 
+// absButton.addEventListener('click', () => {
+//     const expr = display.textContent;
+//     // console.log("her");
+//     console.log(expr);
+//     // Try to find last number or expression inside parentheses
+//     const match = expr.match(/(\(?[-+]?\d*\.?\d+\)?)(?!.*\d)/);
+//     // console.log(match);
+
+//     if (expr === '0') {
+//         display.textContent = '0';
+//     }
+
+//     if (match) {
+//         const start = match.index;
+//         const length = match[0].length;
+//         const absWrapped = `Math.abs(${match[0]})`;
+
+//         if (match[0][0] == '-') {
+//             display.textContent = expr.slice(0, start) + '+' + absWrapped;
+//         }
+//         else if (match[0][0] !== '+' && match[0][0] !== '-') {
+//             display.textContent = expr.slice(0, start) + absWrapped;
+//         }
+
+//         else {
+//             display.textContent = expr.slice(0, start) + match[0][0] + absWrapped;
+//         }
+
+//     }
+// });
+
 absButton.addEventListener('click', () => {
     const expr = display.textContent;
-    // console.log("her");
-    console.log(expr);
-    // Try to find last number or expression inside parentheses
-    const match = expr.match(/(\(?[-+]?\d*\.?\d+\)?)(?!.*\d)/);
-    // console.log(match);
 
-    if (expr === '0') {
-        display.textContent = '0';
+    if (expr === '0' || expr === 'Error') {
+        display.textContent = 'Math.abs(';
+        return;
     }
+
+    const match = expr.match(/(\(?[-+]?\d*\.?\d+\)?)(?!.*\d)/);
 
     if (match) {
         const start = match.index;
-        const length = match[0].length;
-        const absWrapped = `Math.abs(${match[0]})`;
+        const matchedValue = match[0];
+        const beforeMatch = expr[start - 1];
+        let absWrapped = `Math.abs(${matchedValue})`;
 
-        if (match[0][0] == '-') {
-            display.textContent = expr.slice(0, start) + '+' + absWrapped;
-        }
-        else if (match[0][0] !== '+' && match[0][0] !== '-') {
-            display.textContent = expr.slice(0, start) + absWrapped;
-        }
-
-        else {
-            display.textContent = expr.slice(0, start) + match[0][0] + absWrapped;
+        // If there's a digit, closing bracket or π before the match, prepend '*'
+        if (beforeMatch && (/\d|\)|π/.test(beforeMatch))) {
+            absWrapped = `*${absWrapped}`;
         }
 
+        // Now rebuild expression
+        const newExpr = expr.slice(0, start) + absWrapped;
+        display.textContent = newExpr;
     }
 });
-
 
 
 powerButton.addEventListener('click', () => {
@@ -519,6 +545,7 @@ piButton.addEventListener('click', () => {
 
 floorButton.addEventListener('click', () => {
     const expr = display.textContent;
+    const lastChar = display.textContent.slice(-1);
 
 
     const match = expr.match(/(\d*\.?\d+)(?!.*\d)/);
@@ -536,17 +563,26 @@ floorButton.addEventListener('click', () => {
     // }
     if (display.textContent === '0' || display.textContent === 'Error') {
         display.textContent = 'Math.floor(';
-    } else {
+    } else if (lastChar === '(') {
+        display.textContent += 'Math.floor(';
+    }
+    else {
         display.textContent += '*Math.floor(';
     }
 });
 
 ceilButton.addEventListener('click', () => {
     // const expr = display.textContent;
+    const lastChar = display.textContent.slice(-1);
+
 
     if (display.textContent === '0' || display.textContent === 'Error') {
         display.textContent = 'Math.ceil(';
-    } else {
+    }
+    else if (lastChar === '(') {
+        display.textContent += 'Math.floor(';
+    }
+    else {
         display.textContent += '*Math.ceil(';
     }
 })
