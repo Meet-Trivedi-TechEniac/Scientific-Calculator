@@ -160,7 +160,7 @@ buttons.forEach(button => {
 
 
         // if error is there then clear it
-        if (display.textContent === 'Error') {
+        if (display.textContent === 'Error' || display.textContent === 'NaN') {
             display.textContent = '0';
         }
 
@@ -203,6 +203,8 @@ buttons.forEach(button => {
 
             return;
         }
+
+
 
         if (!isNaN(lastChar)) {
             if (display.textContent.endsWith('E')) {
@@ -298,7 +300,7 @@ openParenButton.addEventListener('click', () => {
     if (display.textContent === '0') {
         display.textContent = '(';
     }
-    else if (operators.includes(lastChar)) {
+    else if (operators.includes(lastChar) || lastChar === '(') {
         display.textContent += '(';
     }
     else {
@@ -323,9 +325,16 @@ closeParenButton.addEventListener('click', () => {
 lnButton.addEventListener('click', () => {
     resetAfterEval('ln');
     const expr = display.textContent;
+    let lastChar = display.textContent.slice(-1);
+
 
     if (display.textContent === '0' || display.textContent === 'Error') {
         display.textContent = 'Math.log(';
+    }
+
+    else if (lastChar === '(') {
+        display.textContent += 'Math.log(';
+
     } else {
         display.textContent += '*Math.log(';
     }
@@ -333,10 +342,16 @@ lnButton.addEventListener('click', () => {
 
 logButton.addEventListener('click', () => {
     resetAfterEval('log');
+    let lastChar = display.textContent.slice(-1);
 
     if (display.textContent === '0' || display.textContent === 'Error') {
         display.textContent = 'Math.log10(';
-    } else {
+    }
+    else if (lastChar === '(') {
+        display.textContent += 'Math.log10(';
+
+    }
+    else {
         display.textContent += '*Math.log10(';
     }
 });
@@ -580,7 +595,7 @@ ceilButton.addEventListener('click', () => {
         display.textContent = 'Math.ceil(';
     }
     else if (lastChar === '(') {
-        display.textContent += 'Math.floor(';
+        display.textContent += 'Math.ceil(';
     }
     else {
         display.textContent += '*Math.ceil(';
@@ -616,6 +631,7 @@ mrButton.addEventListener('click', () => {
     console.log('mv', memoryValue);
     // display.textContent += String(memoryValue);
     display.textContent = String(memoryValue);
+    // display.textContent += '*';
 
 });
 
@@ -629,9 +645,10 @@ mcButton.addEventListener('click', () => {
 mPlusButton.addEventListener('click', () => {
     try {
         memoryValue += eval(display.textContent);
+        display.textContent = '0';
     } catch (error) {
 
-        // display.textContent = 'Error';
+        display.textContent = 'Error';
 
     }
 
@@ -642,8 +659,10 @@ mPlusButton.addEventListener('click', () => {
 mMinusButton.addEventListener('click', () => {
     try {
         memoryValue -= eval(display.textContent);
+        display.textContent = '0';
+
     } catch (error) {
-        // display.textContent = 'Error';
+        display.textContent = 'Error';
 
     }
     updateMemoryDisplay();
@@ -679,46 +698,106 @@ document.getElementById('sin').addEventListener('click', () => {
 });
 
 document.getElementById('cos').addEventListener('click', () => {
-    if (display.textContent === '0' || display.textContent === 'Error') {
+    if (
+        display.textContent === '0' ||
+        display.textContent === 'Error' ||
+        display.textContent === ''
+    ) {
         display.textContent = 'Math.cos(';
     } else {
-        display.textContent += '*Math.cos(';
+        const lastChar = display.textContent.slice(-1);
+
+        // If last char is a number, variable, or closing parenthesis, assume multiplication
+        if (/\d|\)|\w/.test(lastChar)) {
+            display.textContent += '*Math.cos(';
+            console.log(display.textContent);
+        } else {
+            display.textContent += 'Math.cos(';
+        }
     }
 });
 
 
 document.getElementById('tan').addEventListener('click', () => {
-    if (display.textContent === '0' || display.textContent === 'Error') {
+    if (
+        display.textContent === '0' ||
+        display.textContent === 'Error' ||
+        display.textContent === ''
+    ) {
         display.textContent = 'Math.tan(';
     } else {
-        display.textContent += '*Math.tan(';
+        const lastChar = display.textContent.slice(-1);
+
+        // If last char is a number, variable, or closing parenthesis, assume multiplication
+        if (/\d|\)|\w/.test(lastChar)) {
+            display.textContent += '*Math.tan(';
+            console.log(display.textContent);
+        } else {
+            display.textContent += 'Math.tan(';
+        }
     }
 });
 
 
 document.getElementById('cosec').addEventListener('click', () => {
-    if (display.textContent === '0' || display.textContent === 'Error') {
+    if (
+        display.textContent === '0' ||
+        display.textContent === 'Error' ||
+        display.textContent === ''
+    ) {
         display.textContent = 'Math.cosec(';
     } else {
-        display.textContent += '*Math.cosec(';
+        const lastChar = display.textContent.slice(-1);
+
+        // If last char is a number, variable, or closing parenthesis, assume multiplication
+        if (/\d|\)|\w/.test(lastChar)) {
+            display.textContent += '*Math.cosec(';
+            console.log(display.textContent);
+        } else {
+            display.textContent += 'Math.cosec(';
+        }
     }
 });
 
 
 document.getElementById('sec').addEventListener('click', () => {
-    if (display.textContent === '0' || display.textContent === 'Error') {
+    if (
+        display.textContent === '0' ||
+        display.textContent === 'Error' ||
+        display.textContent === ''
+    ) {
         display.textContent = 'Math.sec(';
     } else {
-        display.textContent += '*Math.sec(';
+        const lastChar = display.textContent.slice(-1);
+
+        // If last char is a number, variable, or closing parenthesis, assume multiplication
+        if (/\d|\)|\w/.test(lastChar)) {
+            display.textContent += '*Math.sec(';
+            console.log(display.textContent);
+        } else {
+            display.textContent += 'Math.sec(';
+        }
     }
 });
 
 
 // document.getElementById('cot').addEventListener('click', () => {
-//     if (display.textContent === '0' || display.textContent === 'Error') {
+//     if (
+//         display.textContent === '0' ||
+//         display.textContent === 'Error' ||
+//         display.textContent === ''
+//     ) {
 //         display.textContent = 'Math.cot(';
 //     } else {
-//         display.textContent += '*Math.cot(';
+//         const lastChar = display.textContent.slice(-1);
+
+//         // If last char is a number, variable, or closing parenthesis, assume multiplication
+//         if (/\d|\)|\w/.test(lastChar)) {
+//             display.textContent += '*Math.cot(';
+//             console.log(display.textContent);
+//         } else {
+//             display.textContent += 'Math.cot(';
+//         }
 //     }
 // });
 
@@ -830,3 +909,4 @@ document.addEventListener('keydown', (e) => {
         }
     }
 })
+

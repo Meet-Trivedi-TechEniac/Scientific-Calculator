@@ -1,3 +1,6 @@
 When i click on delete then functions like floor annd are not remove at one time
 
 % -> modulo   Not Percentage;
+
+after press MR then if user press number or functions -> there are going to into multiple; 
+
