@@ -12,7 +12,9 @@ after pie if i click o number or function then it goes to multiplication  --> Do
 
 after trigo function close bracket if user enter number then it goes to multiplication   --- > Done 👍
 
-if user does two times power then it show wrong 
+if user does two times power then it show wrong 👍
+
+in power function there is bug of adding it 👍
 
 
 

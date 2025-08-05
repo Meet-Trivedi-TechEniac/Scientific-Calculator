@@ -180,7 +180,7 @@ buttons.forEach(button => {
                 display.textContent.endsWith('Math.pow(')
             ) {
                 console.log("here in flag");
-                flag=0;
+                flag = 0;
                 // do nothing: user is continuing the power operation
             }
             else {
@@ -588,6 +588,7 @@ sqrtButton.addEventListener('click', () => {
 
 tenPowerButton.addEventListener('click', () => {
     const expr = display.textContent;
+    let lastChar = display.textContent.slice(-1);
 
     const match = expr.match(/(\d*\.?\d+)(?!.*\d)/);
     if (match) {
@@ -598,8 +599,12 @@ tenPowerButton.addEventListener('click', () => {
 
         if (display.textContent === '0' || display.textContent === 'Error') {
             display.textContent = 'Math.pow(10,';
-        } else {
-            display.textContent += 'Math.pow(10,';
+        }
+        else if (lastChar === ',') {
+            display.textContent += 'Math.pow(10,'
+        }
+        else {
+            display.textContent += '*Math.pow(10,';
         }
     }
 });
