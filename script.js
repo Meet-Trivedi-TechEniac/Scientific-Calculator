@@ -6,6 +6,8 @@ let lastWasFunction = false;
 let angleMode = 'DEG'; // default mode
 let lastResult = null;  // to store result after "="
 let isFE = false;       // track if we're in FE mode
+let justInsertedRandom = false;
+
 
 
 
@@ -91,6 +93,17 @@ function resetAfterEval(value) {
             display.textContent = '0';
             flag = 0;
         }
+    }
+
+    if (justInsertedRandom) {
+        if (!isNaN(value)) {
+            // user pressed number -> replace random
+            display.textContent = value;
+        } else if (value === '(' || value === 'sin' || value === 'cos' || value === 'log' || value === 'ln' || value === 'x²' || value === 'x!' || value === 'π' || value === '√' || value === 'exp' || value === 'xʸ' || value === '1/x' || value === "10^x") {
+            // user pressed a function -> multiply with random
+            display.textContent += '*';
+        }
+        justInsertedRandom = false;
     }
 
 
@@ -557,18 +570,26 @@ reciprocalButton.addEventListener('click', () => {
 
 squareButton.addEventListener('click', () => {
     const expr = display.textContent;
+    let lastChar = display.textContent.slice(-1);
 
     const match = expr.match(/([a-zA-Z0-9\)\]]+)(?!.*[a-zA-Z0-9\)\]])/);
 
-    console.log("match", match);
-    if (match) {
-        const start = match.index;
-        const original = match[0];
-        const squared = `(${original})**2`;
-
-        display.textContent = expr.slice(start, match.length + 1) + squared;
-
+    if (lastChar === '('  || expr === '' || expr === 'Error') {
+        console.log("IN SQUARE");
+        return;
     }
+    else{
+        display.textContent+='**';
+    }
+    // console.log("match", match);
+    // if (match) {
+    //     const start = match.index;
+    //     const original = match[0];
+    //     const squared = `(${original})**2`;
+
+    //     display.textContent = expr.slice(start, match.length + 1) + squared;
+
+    // }
 });
 
 sqrtButton.addEventListener('click', () => {
@@ -898,6 +919,14 @@ document.getElementById('feButton').addEventListener('click', () => {
         display.textContent = String(lastResult);
     }
 });
+
+document.getElementById('randButton').addEventListener('click', () => {
+    const randValue = Math.random();  // generates 0 to 1
+    display.textContent = String(randValue);
+    justInsertedRandom = true;
+    flag = 0;
+});
+
 
 
 
