@@ -10,10 +10,6 @@ let justInsertedRandom = false;
 let randFlag = false;
 
 
-
-
-
-
 const display = document.getElementById('display');
 const buttons = document.querySelectorAll('.btn');
 const clearButton = document.getElementById('clear');
@@ -44,6 +40,7 @@ const mMinusButton = document.getElementById('mminus');
 const memoryEl = document.getElementById('memoryValue');
 const historyList = document.getElementById('historyList');
 const toggleAngleButton = document.getElementById('toggleAngleMode');
+const clearHistoryBtn = document.getElementById('clear-history');
 
 
 
@@ -107,8 +104,6 @@ function resetAfterEval(value) {
         }
         justInsertedRandom = false;
     }
-
-
 }
 
 // function for lastchar;
@@ -121,7 +116,6 @@ function getLastChar(expr) {
 function updateMemoryDisplay() {
     memoryEl.textContent = memoryValue;
 }
-
 // function wrapLast(expr, wrapperFn) {
 //     // 1) bracketed expression?
 //     if (expr.endsWith(')')) {
@@ -150,7 +144,6 @@ function applyAndRefresh(fn) {
     const expr = display.textContent;
     display.textContent = fn(expr);
 }
-
 
 buttons.forEach(button => {
     button.addEventListener('click', () => {
@@ -183,9 +176,12 @@ buttons.forEach(button => {
         // const operators = ['+', '-', '*', '/', '**'];
 
         if (lastChar === ')' || lastChar === 'I') {
-            display.textContent += '*';
+            console.log("Double *");
 
+            display.textContent += '*';
         }
+
+
         // console.log(flag);
 
         // if (flag) {
@@ -194,8 +190,7 @@ buttons.forEach(button => {
         //         flag = 0;
         //     }
         //     else {
-        //         console.log("Flag==1")
-
+        //         console.log("Flag==1")  
         //         display.textContent = '0';
         //         flag = 0;
         //     }
@@ -257,7 +252,6 @@ buttons.forEach(button => {
                 // console.log(display.textContent);
             }
             return;
-
         }
 
         //prevent duplicate operators
@@ -275,7 +269,6 @@ buttons.forEach(button => {
 
         }
 
-
         if (lastWasFunction) {
             let lastChar = display.textContent.slice(-1);
             const operators = ['+', '-', '*', '/', '%', '**'];
@@ -292,17 +285,18 @@ buttons.forEach(button => {
         }
 
         if (lastChar == '(') {
-
             display.textContent += value;
             return;
         }
 
+
         display.textContent += value;
 
 
+
+
+
         console.log(display.textContent);
-
-
 
     })
 })
@@ -315,7 +309,13 @@ clearButton.addEventListener('click', () => {
 equalsButton.addEventListener('click', () => {
     try {
         let expr = display.textContent;
+        const openCount = (display.textContent.match(/\(/g) || []).length;
+        const closeCount = (display.textContent.match(/\)/g) || []).length;
 
+
+        const diff = openCount - closeCount;
+        console.log(diff)
+        expr += ')'.repeat(diff);
         // Convert sin(x) to sin(x * PI / 180)
         // if (toggleAngleButton.textContent == 'DEG') {
         //     expr = expr.replace(/Math\.sin\(([^()]+)\)/g, 'Math.sin(($1)*Math.PI/180)');
@@ -339,8 +339,6 @@ equalsButton.addEventListener('click', () => {
             expr = expr.replace(/1\/Math\.tan\(([^()]+)\)/g, '1/Math.tan(($1)*Math.PI/180)');
         }
 
-
-
         if (display.textContent.includes('/0')) {
             display.textContent = 'Error';
             return;
@@ -355,14 +353,13 @@ equalsButton.addEventListener('click', () => {
         console.log("flag after  = ", flag);
 
         const entry = document.createElement('li');
-        entry.textContent = `${expr} = ${result}`;
-        historyList.prepend(entry); // newest at top
+        entry.textContent = `${expr} = ${result}`; 9 +
+            historyList.prepend(entry); // newest at top
 
         // (optional) limit history length:
         if (historyList.children.length > 20) {
             historyList.removeChild(historyList.lastChild);
         }
-
     }
     catch (error) {
         display.textContent = 'Error';
@@ -796,6 +793,7 @@ document.getElementById('sin').addEventListener('click', () => {
     // } else {
     //     display.textContent += '*Math.sin(';
     // }
+    resetAfterEval('sin');
 
     if (
         display.textContent === '0' ||
@@ -817,6 +815,8 @@ document.getElementById('sin').addEventListener('click', () => {
 });
 
 document.getElementById('cos').addEventListener('click', () => {
+        resetAfterEval('cos');
+
     if (
         display.textContent === '0' ||
         display.textContent === 'Error' ||
@@ -838,6 +838,8 @@ document.getElementById('cos').addEventListener('click', () => {
 
 
 document.getElementById('tan').addEventListener('click', () => {
+        resetAfterEval('tan');
+
     if (
         display.textContent === '0' ||
         display.textContent === 'Error' ||
@@ -859,6 +861,8 @@ document.getElementById('tan').addEventListener('click', () => {
 
 
 document.getElementById('cosec').addEventListener('click', () => {
+        resetAfterEval('cosec');
+
     if (
         display.textContent === '0' ||
         display.textContent === 'Error' ||
@@ -880,6 +884,8 @@ document.getElementById('cosec').addEventListener('click', () => {
 
 
 document.getElementById('sec').addEventListener('click', () => {
+        resetAfterEval('sec');
+
     if (
         display.textContent === '0' ||
         display.textContent === 'Error' ||
@@ -901,6 +907,8 @@ document.getElementById('sec').addEventListener('click', () => {
 
 
 // document.getElementById('cot').addEventListener('click', () => {
+        // resetAfterEval('cot');
+// 
 //     if (
 //         display.textContent === '0' ||
 //         display.textContent === 'Error' ||
@@ -951,6 +959,11 @@ randButton.addEventListener('click', () => {
     randFlag = true; // set the special flag
 });
 
+clearHistoryBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear all history?')) {
+        historyList.innerHTML = '';
+    }
+});
 
 
 

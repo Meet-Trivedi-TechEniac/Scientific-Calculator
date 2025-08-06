@@ -17,7 +17,12 @@ if user does two times power then it show wrong 👍
 in power function there is bug of adding it 👍
 
 squareButton apllies after '(' that is wrong thing 👍
- 
+
+
+after ')' ** two star added which is wrong thing
+After pei also two start added when user clicks on * multiply
+
+
 
 
 
