@@ -16,7 +16,8 @@ if user does two times power then it show wrong 👍
 
 in power function there is bug of adding it 👍
 
-squareButton apllies after '(' that is wrong thing
+squareButton apllies after '(' that is wrong thing 👍
+ 
 
 
 

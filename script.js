@@ -7,6 +7,8 @@ let angleMode = 'DEG'; // default mode
 let lastResult = null;  // to store result after "="
 let isFE = false;       // track if we're in FE mode
 let justInsertedRandom = false;
+let randFlag = false;
+
 
 
 
@@ -154,6 +156,21 @@ buttons.forEach(button => {
     button.addEventListener('click', () => {
         const value = button.textContent;
 
+
+        const isNumber = /^[0-9.]$/.test(value); // check if it's a digit or decimal
+
+        // Clear rand-generated number if number is pressed next
+        if (randFlag && isNumber) {
+            display.textContent = value; // replace with new number
+            randFlag = false;
+            flag = 0;
+            return;
+        }
+
+        // If rand is active and operator or function is pressed, treat normally
+        if (randFlag && !isNumber) {
+            randFlag = false; // reset
+        }
         if (value == 'C' || value == '=' || value == '⌫' || value == '+/-' || value == '(' || value == ')' || value == 'ln' || value == 'log' || value == 'x!' || value == 'exp' || value == 'xʸ' || value == '1/x' || value == 'x²' || value == '2√x' || value == "10^x" || value == 'π' || value == 'floor' || value == 'ceil' || value == '|x|' || value == 'sin' || value == 'cos' || value == 'tan' || value == 'cosec' || value == 'sec' || value == 'cot' || value == 'DEG' || value == 'RAD') {
             //Handel LAter
             return;
@@ -574,12 +591,12 @@ squareButton.addEventListener('click', () => {
 
     const match = expr.match(/([a-zA-Z0-9\)\]]+)(?!.*[a-zA-Z0-9\)\]])/);
 
-    if (lastChar === '('  || expr === '' || expr === 'Error') {
+    if (lastChar === '(' || expr === '' || expr === 'Error') {
         console.log("IN SQUARE");
         return;
     }
-    else{
-        display.textContent+='**';
+    else {
+        display.textContent += '**';
     }
     // console.log("match", match);
     // if (match) {
@@ -920,12 +937,20 @@ document.getElementById('feButton').addEventListener('click', () => {
     }
 });
 
-document.getElementById('randButton').addEventListener('click', () => {
-    const randValue = Math.random();  // generates 0 to 1
-    display.textContent = String(randValue);
-    justInsertedRandom = true;
-    flag = 0;
+// document.getElementById('randButton').addEventListener('click', () => {
+//     const randValue = Math.random();  // generates 0 to 1
+//     display.textContent = String(randValue);
+//     justInsertedRandom = true;
+//     flag = 0;
+// });
+
+randButton.addEventListener('click', () => {
+    const randVal = Math.random();  // or use a custom range if needed
+    display.textContent = randVal;
+    flag = 1; // so we handle correctly on next input
+    randFlag = true; // set the special flag
 });
+
 
 
 
