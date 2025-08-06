@@ -1,8 +1,13 @@
 
 let flag = 0;
-const operators = ['+', '-', '*', '/', '%', '**','π'];
+const operators = ['+', '-', '*', '/', '%', '**', 'π'];
 let memoryValue = 0;
 let lastWasFunction = false;
+let angleMode = 'DEG'; // default mode
+let lastResult = null;  // to store result after "="
+let isFE = false;       // track if we're in FE mode
+
+
 
 
 const display = document.getElementById('display');
@@ -34,6 +39,7 @@ const mPlusButton = document.getElementById('mplus');
 const mMinusButton = document.getElementById('mminus');
 const memoryEl = document.getElementById('memoryValue');
 const historyList = document.getElementById('historyList');
+const toggleAngleButton = document.getElementById('toggleAngleMode');
 
 
 
@@ -75,7 +81,7 @@ function resetAfterEval(value) {
             flag = 0; // allow chaining operators after result
         } else if (
             currentExpr.endsWith('**') ||
-            currentExpr.endsWith('Math.pow(')  
+            currentExpr.endsWith('Math.pow(')
             // currentExpr.endsWith('PI')
         ) {
             console.log("here in flag");
@@ -101,29 +107,29 @@ function updateMemoryDisplay() {
     memoryEl.textContent = memoryValue;
 }
 
-function wrapLast(expr, wrapperFn) {
-    // 1) bracketed expression?
-    if (expr.endsWith(')')) {
-        let balance = 0, openIdx = -1;
-        for (let i = expr.length - 1; i >= 0; i--) {
-            if (expr[i] === ')') balance++;
-            else if (expr[i] === '(') balance--;
-            if (balance === 0) { openIdx = i; break; }
-        }
-        if (openIdx !== -1) {
-            const inside = expr.slice(openIdx);
-            return expr.slice(0, openIdx) + wrapperFn(inside);
-        }
-    }
-    // 2) trailing number?
-    const m = expr.match(/(\d*\.?\d+)(?!.*\d)/);
-    if (m) {
-        const [num] = m;
-        const start = m.index;
-        return expr.slice(0, start) + wrapperFn(num);
-    }
-    return expr;
-}
+// function wrapLast(expr, wrapperFn) {
+//     // 1) bracketed expression?
+//     if (expr.endsWith(')')) {
+//         let balance = 0, openIdx = -1;
+//         for (let i = expr.length - 1; i >= 0; i--) {
+//             if (expr[i] === ')') balance++;
+//             else if (expr[i] === '(') balance--;
+//             if (balance === 0) { openIdx = i; break; }
+//         }
+//         if (openIdx !== -1) {
+//             const inside = expr.slice(openIdx);
+//             return expr.slice(0, openIdx) + wrapperFn(inside);
+//         }
+//     }
+//     // 2) trailing number?
+//     const m = expr.match(/(\d*\.?\d+)(?!.*\d)/);
+//     if (m) {
+//         const [num] = m;
+//         const start = m.index;
+//         return expr.slice(0, start) + wrapperFn(num);
+//     }
+//     return expr;
+// }
 
 function applyAndRefresh(fn) {
     const expr = display.textContent;
@@ -135,17 +141,13 @@ buttons.forEach(button => {
     button.addEventListener('click', () => {
         const value = button.textContent;
 
-
-
-        if (value == 'C' || value == '=' || value == '⌫' || value == '+/-' || value == '(' || value == ')' || value == 'ln' || value == 'log' || value == 'x!' || value == 'exp' || value == 'xʸ' || value == '1/x' || value == 'x²' || value == '2√x' || value == "10^x" || value == 'π' || value == 'floor' || value == 'ceil' || value == '|x|' || value == 'sin' || value == 'cos' || value == 'tan' || value == 'cosec' || value == 'sec' || value == 'cot') {
+        if (value == 'C' || value == '=' || value == '⌫' || value == '+/-' || value == '(' || value == ')' || value == 'ln' || value == 'log' || value == 'x!' || value == 'exp' || value == 'xʸ' || value == '1/x' || value == 'x²' || value == '2√x' || value == "10^x" || value == 'π' || value == 'floor' || value == 'ceil' || value == '|x|' || value == 'sin' || value == 'cos' || value == 'tan' || value == 'cosec' || value == 'sec' || value == 'cot' || value == 'DEG' || value == 'RAD') {
             //Handel LAter
             return;
-
-
         }
 
         const lastChar = display.textContent.slice(-1);
-        const lastTwoChar = display.textContent.slice(-2);
+        // const lastTwoChar = display.textContent.slice(-2);
         // console.log(lastTwoChar);
         const operators = ['+', '-', '*', '/', '%', '**'];
         // const operators = ['+', '-', '*', '/', '**'];
@@ -171,9 +173,9 @@ buttons.forEach(button => {
 
         if (flag) {
             const isOperator = operators.includes(value);
-            const isFuncOrBracket = ['(', 'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.log(', 'Math.ceil(', 'Math.floor(', 'Math.exp(', 'Math.sqrt(', 'Math.exp(','π'].some(f => display.textContent.includes(f));
+            const isFuncOrBracket = ['(', 'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.log(', 'Math.ceil(', 'Math.floor(', 'Math.exp(', 'Math.sqrt(', 'Math.exp(', 'π'].some(f => display.textContent.includes(f));
 
-            if (isOperator || isFuncOrBracket || value === '(' || display.textContent!='0') {
+            if (isOperator || isFuncOrBracket || value === '(' || display.textContent != '0') {
                 // Continue chaining
                 flag = 0;
             }
@@ -193,14 +195,10 @@ buttons.forEach(button => {
             }
         }
 
-
-
-
         // if error is there then clear it
         if (display.textContent === 'Error' || display.textContent === 'NaN') {
             display.textContent = '0';
         }
-
 
         // starting with 0 or operator
         if (display.textContent === '0' && operators.includes(value)) {
@@ -216,7 +214,6 @@ buttons.forEach(button => {
                 return;
             }
         }
-
 
         if (display.textContent === '0' && value !== '.') {
             // But allow if previous char is (
@@ -241,8 +238,6 @@ buttons.forEach(button => {
             return;
         }
 
-
-
         if (!isNaN(lastChar)) {
             if (display.textContent.endsWith('E')) {
                 display.textContent += '*';
@@ -258,10 +253,7 @@ buttons.forEach(button => {
             if (lastChar === '(') {
 
             }
-
-
             // else if (!operators.includes(value) || value === ')') {
-
             else if (!operators.includes(value)) {
                 display.textContent += '*';
                 console.log("catch");
@@ -292,17 +284,32 @@ clearButton.addEventListener('click', () => {
 
 equalsButton.addEventListener('click', () => {
     try {
-
         let expr = display.textContent;
 
         // Convert sin(x) to sin(x * PI / 180)
-        expr = expr.replace(/Math\.sin\(([^()]+)\)/g, 'Math.sin(($1)*Math.PI/180)');
-        console.log("sin expr", expr);
-        expr = expr.replace(/Math\.cos\(([^()]+)\)/g, 'Math.cos(($1)*Math.PI/180)');
-        expr = expr.replace(/Math\.tan\(([^()]+)\)/g, 'Math.tan(($1)*Math.PI/180)');
-        expr = expr.replace(/1\/Math\.sin\(([^()]+)\)/g, '1/Math.sin(($1)*Math.PI/180)');
-        expr = expr.replace(/1\/Math\.cos\(([^()]+)\)/g, '1/Math.cos(($1)*Math.PI/180)');
-        expr = expr.replace(/1\/Math\.tan\(([^()]+)\)/g, '1/Math.tan(($1)*Math.PI/180)');
+        // if (toggleAngleButton.textContent == 'DEG') {
+        //     expr = expr.replace(/Math\.sin\(([^()]+)\)/g, 'Math.sin(($1)*Math.PI/180)');
+        //     console.log("sin expr", expr);
+        //     expr = expr.replace(/Math\.cos\(([^()]+)\)/g, 'Math.cos(($1)*Math.PI/180)');
+        //     expr = expr.replace(/Math\.tan\(([^()]+)\)/g, 'Math.tan(($1)*Math.PI/180)');
+        //     expr = expr.replace(/1\/Math\.sin\(([^()]+)\)/g, '1/Math.sin(($1)*Math.PI/180)');
+        //     expr = expr.replace(/1\/Math\.cos\(([^()]+)\)/g, '1/Math.cos(($1)*Math.PI/180)');
+        //     expr = expr.replace(/1\/Math\.tan\(([^()]+)\)/g, '1/Math.tan(($1)*Math.PI/180)');
+        // }
+
+        if (angleMode === 'DEG') {
+            // Convert degrees to radians
+            expr = expr.replace(/Math\.sin\(([^()]+)\)/g, 'Math.sin(($1)*Math.PI/180)');
+            expr = expr.replace(/Math\.cos\(([^()]+)\)/g, 'Math.cos(($1)*Math.PI/180)');
+            expr = expr.replace(/Math\.tan\(([^()]+)\)/g, 'Math.tan(($1)*Math.PI/180)');
+
+            // Inverse trigonometric (if you implement them later)
+            expr = expr.replace(/1\/Math\.sin\(([^()]+)\)/g, '1/Math.sin(($1)*Math.PI/180)');
+            expr = expr.replace(/1\/Math\.cos\(([^()]+)\)/g, '1/Math.cos(($1)*Math.PI/180)');
+            expr = expr.replace(/1\/Math\.tan\(([^()]+)\)/g, '1/Math.tan(($1)*Math.PI/180)');
+        }
+
+
 
         if (display.textContent.includes('/0')) {
             display.textContent = 'Error';
@@ -311,6 +318,8 @@ equalsButton.addEventListener('click', () => {
         const result = eval(expr);
         display.textContent = '';
         display.textContent = result;
+        lastResult = result;   // <- store result
+        isFE = false;
         console.log(result);
         flag = 1;
         console.log("flag after  = ", flag);
@@ -331,7 +340,9 @@ equalsButton.addEventListener('click', () => {
 })
 backSpaceButton.addEventListener('click', () => {
     const current = display.textContent;
+
     // console.log(current);
+
     if (current.length === 1 || current === 'Error') {
         display.textContent = '0';
     }
@@ -353,7 +364,6 @@ dotButton.addEventListener('click', () => {
 
 
 openParenButton.addEventListener('click', () => {
-
 
     resetAfterEval('(');
     const expr = display.textContent;
@@ -388,7 +398,6 @@ lnButton.addEventListener('click', () => {
     resetAfterEval('ln');
     const expr = display.textContent;
     let lastChar = display.textContent.slice(-1);
-
 
     if (display.textContent === '0' || display.textContent === 'Error') {
         display.textContent = 'Math.log(';
@@ -872,6 +881,24 @@ document.getElementById('sec').addEventListener('click', () => {
 //         }
 //     }
 // });
+
+toggleAngleButton.addEventListener('click', () => {
+    angleMode = angleMode === 'DEG' ? 'RAD' : 'DEG';
+    toggleAngleButton.textContent = angleMode;
+});
+
+document.getElementById('feButton').addEventListener('click', () => {
+    if (lastResult === null) return;
+
+    isFE = !isFE;
+
+    if (isFE) {
+        display.textContent = Number(lastResult).toExponential(8); // e.g., 1.23456789e+7
+    } else {
+        display.textContent = String(lastResult);
+    }
+});
+
 
 
 

@@ -131,3 +131,13 @@ body {
 .history-panel li:last-child {
   border-bottom: none;
 }
+
+#toggleAngleMode {
+  background-color: #eee;
+  color: #444;
+  font-weight: bold;
+}
+#toggleAngleMode:hover {
+  background-color: #eee;
+}
+
